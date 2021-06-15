@@ -1,13 +1,13 @@
 # IntelliJ project files
 .settings/*
-/.idea/
+.idea
 *.iml
 out
 gen
 target
-/.classpath
-/.project/
-/.mvn/
+.classpath
+.project
+.mvn
 
 ### Java template
 # Compiled class file
@@ -32,7 +32,5 @@ target
 *.rar
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
-
 work
-/testing/
+testing
