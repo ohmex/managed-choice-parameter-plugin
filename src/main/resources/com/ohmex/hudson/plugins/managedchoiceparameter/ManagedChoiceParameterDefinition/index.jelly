@@ -1,0 +1,23 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+  xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <st:adjunct includes="com.ohmex.hudson.plugins.managedchoiceparameter.ManagedChoice"/>
+  <script>
+  jQuery(function($) {
+    ManagedChoice.load("${rootURL}/plugin/managed-choice-parameter-plugin/organisation.json", '#product', '#project', '#env');
+  });
+  </script>
+  <f:entry title="Options for Selecting Pipeline" description="${it.description}">
+    <input type="hidden" name="${it.name}" value="${it.value}" />
+    <select name="product" id="product">
+    </select>
+    <select name="project" id="project">
+    </select>
+    <select name="env" id="env">
+    </select>
+  </f:entry>
+  <f:invisibleEntry>
+    <f:textbox value="${it.virtualHost}" />
+  </f:invisibleEntry>
+</j:jelly>

@@ -1,0 +1,9 @@
+<?jelly escape-by-default='true'?>
+<!--
+  This view is used to render the plugin list page.
+
+  Since I don't have anything dynamic here, let's just use static HTML.
+-->
+<div>
+    Adds ability to choose pipeline option parameters from git repository
+</div>
