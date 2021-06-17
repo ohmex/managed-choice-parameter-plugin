@@ -1,23 +1,148 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
-  xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-  <st:adjunct includes="com.ohmex.hudson.plugins.managedchoiceparameter.ManagedChoice"/>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
+  <j:set var="configuration" value="${it.configuration}"/>
+
+  <style>
+  .spacer {
+    column-gap: 40px;
+  }
+  </style>
+
   <script>
-  jQuery(function($) {
-    ManagedChoice.load("${rootURL}/plugin/managed-choice-parameter-plugin/organisation.json", '#product', '#project', '#env');
-  });
+    function getFunction(ctx) {
+
+      function clear(box) {
+        var length = box.options.length;
+        for (i = length-1; i >= 0; i--) {
+          box.options[i] = null;
+        }
+      }
+
+      function insert(box, text, value) {
+        var el = document.createElement("option");
+        el.textContent = text;
+        el.value = value;
+        box.appendChild(el);
+      }
+
+      function insertDefault(box, name) {
+        var el = document.createElement("option");
+        el.textContent = "-- Select " + name + " --";
+        el.value = "filler";
+        el.disabled = "true";
+        el.selected = "selected";
+        box.appendChild(el);
+      }
+
+      function fillProjects(res) {
+        var values = res.responseObject();
+        var boxP = document.getElementById('project');
+        clear(boxP);
+        var boxE = document.getElementById('environment');
+        clear(boxE);
+        insertDefault(boxP, "Project");
+        insertDefault(boxE, "Environment");
+        for(var i = 0; i &lt; values.length; i++) {
+          insert(boxP, values[i], i);
+        }
+      }
+
+      function fillEnv(res) {
+        var values = res.responseObject();
+        var box = document.getElementById('environment');
+        clear(box);
+        insertDefault(box, "Environment");
+        for(var i = 0; i &lt; values.length; i++) {
+          insert(box, values[i], i);
+        }
+      }
+
+      function fillDetails(res) {
+        var json = JSON.parse(res.responseObject());
+        Object.keys(json).forEach(function(key){
+          var value = json[key];
+          alert(key + ':' + value);
+        });
+      }
+
+      if(ctx == "project")
+        return fillProjects;
+      else
+      if(ctx == "environment")
+        return fillEnv;
+      else
+      if(ctx == "detail")
+        return fillDetails;
+    }
+
+    var fillProjects = getFunction("project");
+    var fillEnvironments = getFunction("environment");
+    var fillDetails = getFunction("detail");
+
+    var remote = <st:bind value="${it}"/>;
+
+    function onProductChanged(object) {
+      remote.getProjects(object.value, fillProjects);
+    }
+
+    function onProjectChanged(object) {
+      var productBox = document.getElementById('product');
+      var curProduct = productBox.options[productBox.selectedIndex].value;
+      remote.getEnvironments(curProduct, object.value, fillEnvironments);
+    }
+
+    function onEnvironmentChanged(object) {
+      var productBox = document.getElementById('product');
+      var curProduct = productBox.options[productBox.selectedIndex].value;
+      var projectBox = document.getElementById('project');
+      var curProject = projectBox.options[projectBox.selectedIndex].value;
+      remote.getDetails(curProduct, curProject, object.value, fillDetails);
+    }
+
   </script>
-  <f:entry title="Options for Selecting Pipeline" description="${it.description}">
-    <input type="hidden" name="${it.name}" value="${it.value}" />
-    <select name="product" id="product">
-    </select>
-    <select name="project" id="project">
-    </select>
-    <select name="env" id="env">
-    </select>
+
+  <f:entry title="${it.name}" description="${it.description}">
+    <div name="parameter" description="${it.description}">
+    <input type="hidden" name="name" value="${it.name}" />
+    <table class="spacer">
+      <tbody>
+        <tr/>
+        <tr>
+          <td>Product</td>
+          <td>:</td>
+          <td>
+            <select name="product" id="product" onchange="onProductChanged(this)">
+              <option value="filler" disabled="true" selected="selected">-- Select Product --</option>
+              <j:set var="id" value="0"/>
+              <j:forEach var="choice" items="${configuration.products}">
+                <option value="${id}" >${choice}</option>
+                <j:set var="id" value="${id + 1}"/>
+              </j:forEach>
+            </select>
+          </td>
+        </tr>
+        <tr/>
+        <tr>
+          <td>Project</td>
+          <td>:</td>
+          <td>
+            <select name="project" id="project" onchange="onProjectChanged(this)">
+              <option value="filler" disabled="true" selected="selected">-- Select Project --</option>
+            </select>
+          </td>
+        </tr>
+        <tr/>
+        <tr>
+          <td>Environment</td>
+          <td>:</td>
+          <td>
+            <select name="environment" id="environment" onchange="onEnvironmentChanged(this)">
+              <option value="filler" disabled="true" selected="selected">-- Select Environment --</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
   </f:entry>
-  <f:invisibleEntry>
-    <f:textbox value="${it.virtualHost}" />
-  </f:invisibleEntry>
 </j:jelly>

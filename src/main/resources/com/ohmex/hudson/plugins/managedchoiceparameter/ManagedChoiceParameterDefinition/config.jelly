@@ -7,7 +7,7 @@
     <f:entry title="${%parameter.description}" help="/help/parameter/description.html" field="description">
         <f:textarea name="description" value="${description}" codemirror-mode="${app.markupFormatter.codeMirrorMode}" codemirror-config="${app.markupFormatter.codeMirrorConfig}" previewEndpoint="/markupFormatter/previewDescription" />
     </f:entry>
-    <f:entry title="${%parameter.repository}" field="remoteURL">
+    <f:entry title="${%parameter.repository}" field="configRepoURL">
         <f:textbox/>
     </f:entry>
     <f:entry title="${%parameter.credentials}" field="credentialsId">
